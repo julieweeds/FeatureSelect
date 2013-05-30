@@ -1,6 +1,10 @@
 __author__ = 'Julie'
 
+import re
+
 def configure(args):
+
+    factorPATT=re.compile('f=(.*)')
 
     parameters={}
     #defaults
@@ -23,6 +27,9 @@ def configure(args):
             parameters["at_home"]=False
         if arg=="testing":
             parameters["testing"]=True
+        matchobj=factorPATT.match(arg)
+        if matchobj:
+            parameters["factors"]=matchobj.group(1)
 
 
     if parameters["on_apollo"]:
@@ -31,11 +38,14 @@ def configure(args):
 
     if parameters["testing"]:
         parameters["parent"]="../data/"
+        parameters["dir"]=parameters["parent"]+"./"
         parameters["file"]="toyvectors2"
-        parameters["factors"]=3
+        parameters["name"]="toyvectors2"
+        #parameters["factors"]=3
     else:
-        parameters["file"]="giga_t100f100_nouns_deps/vectors"
-    parameters["infile"]=parameters["parent"]+parameters["file"]
+        parameters["name"]="gigaword_t100"
+        parameters["dir"]=parameters["parent"]+"giga_t100f100_nouns_deps/"
+    #parameters["infile"]=parameters["dir"]+parameters["name"]+".events.filtered.strings"
 
 
 

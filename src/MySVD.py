@@ -56,28 +56,31 @@ class Vector:
 
 class SVD:
 
-    def __init__(self,infile,factors):
-        self.infile=infile
-        self.outfile=infile+".svd"+str(factors)+".events.filtered.strings"
-        self.entryfile=infile+".svd"+str(factors)+".entries.filtered.strings"
-        self.featurefile=infile+".svd"+str(factors)+".features.filtered.strings"
+    def __init__(self,dir,name,factors):
+        self.dir=dir
+        self.name=name
+
+        self.infile=self.dir+self.name+".entries.filtered.strings"
+        self.outfile=self.dir+"svd"+str(factors)+"/"+self.name+".events.filtered.strings"
+        self.entryfile=self.dir+"svd"+str(factors)+"/"+self.name+".entries.filtered.strings"
+        self.featurefile=self.dir+"svd"+str(factors)+"/"+self.name+".features.filtered.strings"
         self.vectordict={}
         self.allfeatures=[]
         self.fk_idx={}
         self.dim=0
         self.fullmatrix=[]  #sparse csc_matrix
         self.reducedmatrix=[]  #numpy matrix
-        self.factors=factors
+        self.factors=int(factors)
         self.entrytotals={}
         self.featuretotals={}
 
 
         self.readfile()
         min = self.makematrix()
-        if min<factors:
-            print "Cannot do SVD with "+str(factors)+" factors"
-            factors=min-1
-            print "Reducing to "+str(factors)
+        if min<self.factors:
+            print "Cannot do SVD with "+str(self.factors)+" factors"
+            self.factors=min-1
+            print "Reducing to "+str(self.factors)
 #        self.allpairsims()
         self.reducedim(self.factors)
 #        self.allpairsims()
@@ -206,4 +209,4 @@ class SVD:
 
 if __name__=="__main__":
     parameters = conf.configure(sys.argv)
-    mySVD = SVD(parameters["infile"],parameters["factors"])
+    mySVD = SVD(parameters["dir"],parameters["name"],parameters["factors"])
