@@ -60,7 +60,7 @@ class SVD:
         self.dir=dir
         self.name=name
 
-        self.infile=self.dir+self.name+".entries.filtered.strings"
+        self.infile=self.dir+self.name+".events.filtered.strings"
         self.outfile=self.dir+"svd"+str(factors)+"/"+self.name+".events.filtered.strings"
         self.entryfile=self.dir+"svd"+str(factors)+"/"+self.name+".entries.filtered.strings"
         self.featurefile=self.dir+"svd"+str(factors)+"/"+self.name+".features.filtered.strings"
