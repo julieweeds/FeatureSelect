@@ -5,9 +5,9 @@ def configure(args):
     parameters={}
     #defaults
 
-    parameters["at_home"]=True
+    parameters["at_home"]=False
     parameters["local"]=False
-    parameters["on_apollo"]=False
+    parameters["on_apollo"]=True
     parameters["reduction"]=1
     parameters["testing"]=False
     parameters["factors"]=1000
@@ -24,12 +24,13 @@ def configure(args):
         if arg=="testing":
             parameters["testing"]=True
 
-    parameters["parent"]="../data/"
+
     if parameters["on_apollo"]:
 
         parameters["parent"]="/mnt/lustre/scratch/inf/juliewe/FeatureExtractionToolkit/Byblo-2.2.0/"
 
     if parameters["testing"]:
+        parameters["parent"]="../data/"
         parameters["file"]="toyvectors2"
         parameters["factors"]=3
     else:

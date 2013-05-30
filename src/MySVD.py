@@ -13,6 +13,7 @@ class Vector:
         self.array=""
         self.rowindex=-1
 
+
     def dotproduct(self,avector):
         return self.array.multiply(avector.array).sum()
 
@@ -57,14 +58,18 @@ class SVD:
 
     def __init__(self,infile,factors):
         self.infile=infile
-        self.outfile=infile+".svd"+str(factors)
+        self.outfile=infile+".svd"+str(factors)+".events.filtered.strings"
+        self.entryfile=infile+".svd"+str(factors)+".entries.filtered.strings"
+        self.featurefile=infile+".svd"+str(factors)+".features.filtered.strings"
         self.vectordict={}
         self.allfeatures=[]
         self.fk_idx={}
         self.dim=0
-        self.fullmatrix=[]
-        self.reducedmatrix=[]
+        self.fullmatrix=[]  #sparse csc_matrix
+        self.reducedmatrix=[]  #numpy matrix
         self.factors=factors
+        self.entrytotals={}
+        self.featuretotals={}
 
 
         self.readfile()
@@ -76,6 +81,7 @@ class SVD:
 #        self.allpairsims()
         self.reducedim(self.factors)
 #        self.allpairsims()
+        self.calctotals()
         self.output()
 
     def readfile(self):
@@ -94,7 +100,7 @@ class SVD:
                 #      print "Made entry for "+entry
             self.vectordict[entry].addfeatures(fields)
             linesread+=1
-            if linesread%10==0:
+            if linesread%1000==0:
                 print "Read "+str(linesread)+" lines"
         instream.close()
 
@@ -167,6 +173,15 @@ class SVD:
         for vector in self.vectordict.values():
             vector.array=sparse.csc_matrix(self.reducedmatrix[vector.rowindex])
 
+    def calctotals(self):
+        for vectorkey in self.vectordict.keys():
+            total=self.vectordict[vectorkey].array.sum()
+            self.entrytotals[vectorkey]=total
+        ftotals=self.reducedmatrix.sum(axis=0)
+        for i in range(self.factors):
+            label = "f"+str(i)
+            total = ftotals[i]
+            self.featuretotals[label]=total
 
     def allpairsims(self):
         for avector in self.vectordict.values():
@@ -180,7 +195,14 @@ class SVD:
         for vector in self.vectordict.values():
             vector.outputvector(outstream)
         outstream.close()
-
+        outstream=open(self.entryfile,'w')
+        for key in self.entrytotals.keys():
+            outstream.write(key+"\t"+str(self.entrytotals[key])+"\n")
+        outstream.close()
+        outstream=open(self.featurefile,'w')
+        for key in self.featuretotals.keys():
+            outstream.write(key+"\t"+str(self.featuretotals[key])+"\n")
+        outstream.close()
 
 if __name__=="__main__":
     parameters = conf.configure(sys.argv)
