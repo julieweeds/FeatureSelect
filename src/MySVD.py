@@ -3,6 +3,7 @@ __author__ = 'juliewe'
 import conf, sys, numpy, math
 import scipy.sparse as sparse
 from scipy.sparse.linalg import svds as svds
+import re
 
 
 class Vector:
@@ -17,15 +18,18 @@ class Vector:
     def dotproduct(self,avector):
         return self.array.multiply(avector.array).sum()
 
-    def addfeatures(self,list):
+    def addfeatures(self,list,filteredS):
 
         while len(list)>0:
             feature=list.pop()
             value=list.pop()
-            if feature in self.features.keys():
-                print "Error: already have "+feature+" for "+self.entry
+            if feature in filteredS:
+                print "Discarded "+self.entry+" "+feature+" "+value
             else:
-                self.features[feature]=value
+                if feature in self.features.keys():
+                    print "Error: already have "+feature+" for "+self.entry
+                else:
+                    self.features[feature]=value
 
     def length(self):
         return math.pow(self.dotproduct(self),0.5)
@@ -55,6 +59,8 @@ class Vector:
 
 
 class SVD:
+
+    filteredS = ["___FILTERED___"]
 
     def __init__(self,dir,name,factors):
         self.dir=dir
@@ -93,15 +99,19 @@ class SVD:
         linesread=0
         for line in instream:
             line=line.rstrip()
+
             fields=line.split('\t')
             fields.reverse()
             entry = fields.pop()
-            if entry in self.vectordict.keys():
-                print "Error: already have vector for "+entry
+            if entry in SVD.filteredS:
+                print "Discarding line starting "+entry
             else:
-                self.vectordict[entry]=Vector(entry)
-                #      print "Made entry for "+entry
-            self.vectordict[entry].addfeatures(fields)
+                if entry in self.vectordict.keys():
+                    print "Error: already have vector for "+entry
+                else:
+                    self.vectordict[entry]=Vector(entry)
+                    #      print "Made entry for "+entry
+                self.vectordict[entry].addfeatures(fields,SVD.filteredS)
             linesread+=1
             if linesread%1000==0:
                 print "Read "+str(linesread)+" lines"
