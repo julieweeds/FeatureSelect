@@ -170,21 +170,26 @@ class SVD:
         print "Number of factors is "+str(factors)
 
         ut,s,vt = svds(self.fullmatrix,factors)
+        print "Completed svd routine"
         self.reducedmatrix=numpy.dot(ut,numpy.diag(s))
+        print "Computed reduced vector space"
 
         #print self.reducedmatrix
         for vector in self.vectordict.values():
             vector.array=sparse.csc_matrix(self.reducedmatrix[vector.rowindex])
+        print "Stored individual vectros"
 
     def calctotals(self):
         for vectorkey in self.vectordict.keys():
             total=self.vectordict[vectorkey].array.sum()
             self.entrytotals[vectorkey]=total
         ftotals=self.reducedmatrix.sum(axis=0)
+        print "Calculated row totals"
         for i in range(self.factors):
             label = "f"+str(i)
             total = ftotals[i]
             self.featuretotals[label]=total
+        print "Calculated column totals"
 
     def allpairsims(self):
         for avector in self.vectordict.values():
@@ -194,6 +199,7 @@ class SVD:
 
 
     def output(self):
+        print "Writing output files"
         outstream=open(self.outfile,'w')
         for vector in self.vectordict.values():
             vector.outputvector(outstream)
@@ -206,6 +212,7 @@ class SVD:
         for key in self.featuretotals.keys():
             outstream.write(key+"\t"+str(self.featuretotals[key])+"\n")
         outstream.close()
+        print "Completed output"
 
 if __name__=="__main__":
     parameters = conf.configure(sys.argv)
