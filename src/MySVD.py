@@ -200,13 +200,19 @@ class SVD:
                 exit(1)
 
         print "Completed svd routine"
+
         self.reducedmatrix=numpy.dot(ut,numpy.diag(s))
         print "Computed reduced vector space"
 
-        #print self.reducedmatrix
+        #remove negative numbers - make equal to zero
+        self.reducedmatrix[self.reducedmatrix<0]=0
+
+#        print self.reducedmatrix
         for vector in self.vectordict.values():
             vector.array=sparse.csc_matrix(self.reducedmatrix[vector.rowindex])
-        print "Stored individual vectros"
+        print "Stored individual vectors"
+
+
 
     def calctotals(self):
         for vectorkey in self.vectordict.keys():
