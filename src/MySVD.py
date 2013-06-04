@@ -5,7 +5,7 @@ import scipy.sparse as sparse
 from scipy.sparse.linalg import svds as svds
 import re
 
-def FixNaNs(m)
+def FixNaNs(m):
     #replace nans in numpy.array with 0s as these must be result of underflow in svds routine
     idxs=numpy.nonzero(m==m)[0]
     if len(idxs)==0:
