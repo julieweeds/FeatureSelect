@@ -5,6 +5,17 @@ import scipy.sparse as sparse
 from scipy.sparse.linalg import svds as svds
 import re
 
+def FixNaNs(m)
+    #replace nans in numpy.array with 0s as these must be result of underflow in svds routine
+    idxs=numpy.nonzero(m==m)[0]
+    if len(idxs)==0:
+        print "No NaNs found"
+        return m
+    for i in range(0,len(idxs)):
+        m[idxs[i]]=0
+    return m
+
+
 
 class Vector:
 
@@ -180,6 +191,14 @@ class SVD:
         print "Number of factors is "+str(factors)
 
         ut,s,vt = svds(self.fullmatrix,factors)
+
+        if numpy.isnan(numpy.min(s)):
+            print "Warning: diagonal matrix contains NaNs"
+            s=FixNaNs(s)
+            if numpy.isnan(numpy.min(s)):
+                print "Error: diagonal matrix still contains NaNs, exiting"
+                exit(1)
+
         print "Completed svd routine"
         self.reducedmatrix=numpy.dot(ut,numpy.diag(s))
         print "Computed reduced vector space"
