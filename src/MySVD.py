@@ -194,7 +194,8 @@ class SVD:
 
         if numpy.isnan(numpy.min(s)):
             print "Warning: diagonal matrix contains NaNs"
-            s=FixNaNs(s)
+            #s=FixNaNs(s)
+            s[numpy.isnan(s)]=0
             if numpy.isnan(numpy.min(s)):
                 print "Error: diagonal matrix still contains NaNs, exiting"
                 exit(1)
