@@ -31,7 +31,7 @@ def configure(args):
         if arg=="nmf":
             parameters["method"]="nmf"
         if arg=="svd":
-            parameters["svd"]="svd"
+            parameters["method"]="svd"
         matchobj=factorPATT.match(arg)
         if matchobj:
             parameters["factors"]=matchobj.group(1)

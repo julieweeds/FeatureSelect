@@ -284,7 +284,7 @@ if __name__=="__main__":
     print "Started at "+datetime.datetime.fromtimestamp(starttime).strftime('%Y-%m-%d %H:%M:%S')
     mySVD = SVD(parameters["dir"],parameters["name"],parameters["method"],parameters["factors"],parameters["testing"])
     endtime=time.time()
-    print "Finished at "+datetime.datetime.fromtimestam(endtime).strftime('%Y-%m-%d %H:%M:%S')
+    print "Finished at "+datetime.datetime.fromtimestamp(endtime).strftime('%Y-%m-%d %H:%M:%S')
     elapsed = endtime-starttime
     hourselapsed=int(elapsed/3600)
     minselapsed=int((elapsed-hourselapsed*3600)/60)
