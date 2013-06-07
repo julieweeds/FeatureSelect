@@ -3,7 +3,8 @@ __author__ = 'juliewe'
 import conf, sys, numpy, math
 import scipy.sparse as sparse
 from scipy.sparse.linalg import svds as svds
-import re
+from sklearn.decomposition import ProjectedGradientNMF
+
 
 def FixNaNs(m):
     #replace nans in numpy.array with 0s as these must be result of underflow in svds routine
@@ -73,20 +74,21 @@ class SVD:
 
     filteredS = ["___FILTERED___"]
 
-    def __init__(self,dir,name,factors):
+    def __init__(self,dir,name,method,factors):
         self.dir=dir
         self.name=name
 
         self.infile=self.dir+self.name+".events.filtered.strings"
-        self.outfile=self.dir+"svd"+str(factors)+"/"+self.name+".events.filtered.strings"
-        self.entryfile=self.dir+"svd"+str(factors)+"/"+self.name+".entries.filtered.strings"
-        self.featurefile=self.dir+"svd"+str(factors)+"/"+self.name+".features.filtered.strings"
+        self.outfile=self.dir+method+str(factors)+"/"+self.name+".events.filtered.strings"
+        self.entryfile=self.dir+method+str(factors)+"/"+self.name+".entries.filtered.strings"
+        self.featurefile=self.dir+method+str(factors)+"/"+self.name+".features.filtered.strings"
         self.vectordict={}
         self.allfeatures=[]
         self.fk_idx={}
         self.dim=0
         self.fullmatrix=[]  #sparse csc_matrix
         self.reducedmatrix=[]  #numpy matrix
+        self.method=method #svd or nmf?
         self.factors=int(factors)
         self.entrytotals={}
         self.featuretotals={}
@@ -99,7 +101,7 @@ class SVD:
             self.factors=min-1
             print "Reducing to "+str(self.factors)
 #        self.allpairsims()
-        self.reducedim(self.factors)
+        self.reducedim(self.method,self.factors)
 #        self.allpairsims()
         self.calctotals()
         self.output()
@@ -185,8 +187,16 @@ class SVD:
         #print self.fullmatrix.todense()
 
 
+    def reducedim(self,method,factors):
+        if method=="svd":
+            self.reducedim_svd(factors)
+        elif method == "nmf":
+            self.reducedim_nmf(factors)
+        else:
+            print "Unknown method of feature reduction"
+            exit(1)
 
-    def reducedim(self,factors):
+    def reducedim_svd(self,factors):
         #print self.fullmatrix
         print "Number of factors is "+str(factors)
 
@@ -213,9 +223,25 @@ class SVD:
             vector.array=sparse.csc_matrix(self.reducedmatrix[vector.rowindex])
         print "Stored individual vectors"
 
+    def reducedim_nmf(self,factors):
+        print "Number of factors is "+str(factors)
 
+        model = ProjectedGradientNMF(n_components=factors,init='random',random_state=0)
+        self.reducedmatrix= model.fit_transform(self.fullmatrix)  #left factor w (n*k)
+        h= model.components_ #right factor h (k*d)
 
-    def calctotals(self):
+        if self.testing:
+            print self.fullmatrix
+            print self.reducedmatrix
+            print h
+            v = numpy.dot(self.reducedmatrix,h)
+            print v
+        print "Completed NMF routine"
+        for vector in self.vectordict.values():
+            vector.array=sparse.csc_matrix(self.reducedmatrix[vector.rowindex])
+        print "Stored individual vectors"
+
+def calctotals(self):
         for vectorkey in self.vectordict.keys():
             total=self.vectordict[vectorkey].array.sum()
             self.entrytotals[vectorkey]=total
@@ -252,4 +278,4 @@ class SVD:
 
 if __name__=="__main__":
     parameters = conf.configure(sys.argv)
-    mySVD = SVD(parameters["dir"],parameters["name"],parameters["factors"])
+    mySVD = SVD(parameters["dir"],parameters["name"],parameters["method"],parameters["factors"])

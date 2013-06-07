@@ -12,9 +12,10 @@ def configure(args):
     parameters["at_home"]=False
     parameters["local"]=False
     parameters["on_apollo"]=True
-    parameters["reduction"]=1
+    parameters["reduction"]=2
     parameters["testing"]=False
     parameters["factors"]=1000
+    parameters["method"]="svd"
 
     for arg in args:
         if arg=="at_home":
@@ -27,6 +28,10 @@ def configure(args):
             parameters["at_home"]=False
         if arg=="testing":
             parameters["testing"]=True
+        if arg=="nmf":
+            parameters["method"]="nmf"
+        if arg=="svd":
+            parameters["svd"]="svd"
         matchobj=factorPATT.match(arg)
         if matchobj:
             parameters["factors"]=matchobj.group(1)

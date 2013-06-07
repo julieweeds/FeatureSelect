@@ -4,6 +4,18 @@ import conf, sys, numpy, math
 import scipy.sparse as sparse
 from scipy.sparse.linalg import svds as svds
 
+def writetestdata():
+    #print math.pow(8,0.5)
+    matrix = [["apple","a",2,"b",0,"c",8,"d",6,"e",0],["banana","a",1,"b",6,"c",0,"d",1,"e",7],["orange","a",5,"b",0,"c",7,"d",4,"e",0],["grape","a",7,"b",0,"c",8,"d",5,"e",0],["peach","a",0,"b",10,"c",0,"d",0,"e",7]]
+    file="../data/5x5test"
+    outstream=open(file,'w')
+    for row in matrix:
+        for item in row:
+            outstream.write(str(item)+"\t")
+        outstream.write("\n")
+    outstream.close()
+    return file
+
 
 class Vector:
 
@@ -143,8 +155,15 @@ class SVD:
         print "Number of factors is "+str(factors)
 
         ut,s,vt = svds(self.fullmatrix,factors)
-        self.reducedmatrix=numpy.dot(ut,numpy.diag(s))
+        print "Singular matrix is "
+        print numpy.diag(s)
 
+        self.reducedmatrix=numpy.dot(ut,numpy.diag(s))
+        #print "Left singular vector matrix u is "
+        #print ut
+        #print "Right singular vector matrix vt is "
+        #print vt
+        print "Reduced dimensionality matrix is "
         print self.reducedmatrix
         for vector in self.vectordict.values():
             vector.array=sparse.csc_matrix(self.reducedmatrix[vector.rowindex])
@@ -159,4 +178,4 @@ class SVD:
 
 if __name__=="__main__":
     parameters = conf.configure(sys.argv)
-    mySVD = SVD(parameters["infile"],parameters["reduction"])
+    mySVD = SVD(writetestdata(),parameters["reduction"])
