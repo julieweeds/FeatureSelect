@@ -241,7 +241,7 @@ class SVD:
             vector.array=sparse.csc_matrix(self.reducedmatrix[vector.rowindex])
         print "Stored individual vectors"
 
-def calctotals(self):
+    def calctotals(self):
         for vectorkey in self.vectordict.keys():
             total=self.vectordict[vectorkey].array.sum()
             self.entrytotals[vectorkey]=total
