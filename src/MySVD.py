@@ -4,6 +4,7 @@ import conf, sys, numpy, math
 import scipy.sparse as sparse
 from scipy.sparse.linalg import svds as svds
 from sklearn.decomposition import ProjectedGradientNMF
+import time,datetime
 
 
 def FixNaNs(m):
@@ -74,7 +75,7 @@ class SVD:
 
     filteredS = ["___FILTERED___"]
 
-    def __init__(self,dir,name,method,factors):
+    def __init__(self,dir,name,method,factors,testing):
         self.dir=dir
         self.name=name
 
@@ -92,6 +93,7 @@ class SVD:
         self.factors=int(factors)
         self.entrytotals={}
         self.featuretotals={}
+        self.testing=testing
 
 
         self.readfile()
@@ -278,4 +280,12 @@ class SVD:
 
 if __name__=="__main__":
     parameters = conf.configure(sys.argv)
-    mySVD = SVD(parameters["dir"],parameters["name"],parameters["method"],parameters["factors"])
+    starttime=time.time()
+    print "Started at "+datetime.datetime.fromtimestamp(starttime).strftime('%Y-%m-%d %H:%M:%S')
+    mySVD = SVD(parameters["dir"],parameters["name"],parameters["method"],parameters["factors"],parameters["testing"])
+    endtime=time.time()
+    print "Finished at "+datetime.datetime.fromtimestam(endtime).strftime('%Y-%m-%d %H:%M:%S')
+    elapsed = endtime-starttime
+    hourselapsed=int(elapsed/3600)
+    minselapsed=int((elapsed-hourselapsed*3600)/60)
+    print "Time taken is "+hourselapsed+" hours and "+minselapsed+" minutes."
